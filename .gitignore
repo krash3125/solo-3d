@@ -182,3 +182,11 @@ cython_debug/
 
 # DS_Store
 .DS_Store
+
+# YOLO Model
+yolo*.pt
+
+# Test files
+__MACOSX
+img
+img.zip

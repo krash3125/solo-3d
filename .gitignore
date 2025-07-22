@@ -191,3 +191,12 @@ __MACOSX
 img
 img.zip
 tmp
+
+anycam_output*/
+
+archive/*.ply
+default_building_imgs/
+old_plys/
+ply_to_2d_map/example_*/
+tmp*/
+pointcloud_to_mesh/*.ply

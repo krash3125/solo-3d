@@ -5,24 +5,32 @@ import open3d as o3d
 import os
 import sys
 import subprocess
+from enum import Enum
+from typing import Optional, List
 
 # add system path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+class MeshMethod(str, Enum):
+    POISSON = "poisson"
+    ALPHA = "alpha"
+    BALL_PIVOTING = "ball_pivoting"
+
+
 class MeshGenerationRequest(BaseModel):
     ply_path: str
-    method: str = "poisson"
-    output_path: str = None
-    poisson_depth: int = 8
-    alpha: float = 0.03
-    ball_radii: list = [0.005, 0.01, 0.02]
+    method: Optional[MeshMethod] = MeshMethod.ALPHA
+    output_path: Optional[str] = None
+    poisson_depth: Optional[int] = 8
+    alpha: Optional[float] = 0.03
+    ball_radii: Optional[List[float]] = [0.005, 0.01, 0.02]
 
 
 class MeshGenerationAPI(ls.LitAPI):
     def setup(self, device):
         REPO_URL = "https://github.com/krash3125/solo-3d.git"
-        REPO_PATH = "~/krash3125-solo-3d"
+        REPO_PATH = "krash3125_solo_3d"
         # Clone the repository if it doesn't exist
         repo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), REPO_PATH)
 
@@ -48,33 +56,7 @@ class MeshGenerationAPI(ls.LitAPI):
 
         # Import functions from the cloned repository
         try:
-            # Import the specific functions you need from the cloned repo
-            # Replace these with the actual module and function names from your repo
-            from cloned_repo.mesh_utils import load_point_cloud, preprocess_point_cloud
-            from cloned_repo.reconstruction import (
-                poisson_reconstruction,
-                alpha_shape_reconstruction,
-            )
-            from cloned_repo.normals import estimate_normals
-            from cloned_repo.ball_pivoting import ball_pivoting_reconstruction
-
-            # Store the imported functions as instance variables
-            self.load_point_cloud = load_point_cloud
-            self.preprocess_point_cloud = preprocess_point_cloud
-            self.poisson_reconstruction = poisson_reconstruction
-            self.alpha_shape_reconstruction = alpha_shape_reconstruction
-            self.estimate_normals = estimate_normals
-            self.ball_pivoting_reconstruction = ball_pivoting_reconstruction
-
-            print(
-                "Successfully imported mesh generation functions from cloned repository!"
-            )
-
-        except ImportError as e:
-            print(f"Warning: Could not import functions from cloned repository: {e}")
-            print("Falling back to local pointcloud_to_mesh module...")
-            # Fall back to the local imports if the repo functions aren't available
-            from pointcloud_to_mesh import (
+            from krash3125_solo_3d.pointcloud_to_mesh import (
                 load_point_cloud,
                 preprocess_point_cloud,
                 poisson_reconstruction,
@@ -90,8 +72,13 @@ class MeshGenerationAPI(ls.LitAPI):
             self.estimate_normals = estimate_normals
             self.ball_pivoting_reconstruction = ball_pivoting_reconstruction
 
-        # Store the repo path for later use
-        self.repo_path = repo_path
+            print(
+                "Successfully imported mesh generation functions from cloned repository!"
+            )
+
+        except ImportError as e:
+            print(f"Error: Could not import functions from cloned repository: {e}")
+            raise e
 
     def decode_request(self, request: MeshGenerationRequest):
         return request

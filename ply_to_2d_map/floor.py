@@ -122,6 +122,6 @@ def generate_floor_map(data_folder: str, output_folder: str):
     plt.ion()  # Turn interactive mode back on
 
     return {
-        "png": os.path.join(output_folder, "floor_map.png"),
-        "npz": os.path.join(output_folder, "floor_data.npz"),
+        "floor_map_image": os.path.join(output_folder, "floor_map.png"),
+        "floor_map_data": os.path.join(output_folder, "floor_data.npz"),
     }

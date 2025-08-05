@@ -199,12 +199,30 @@ class PointCloudGenerationAPI(ls.LitAPI):
                 "-y",
             ]
 
+            cmd2 = [
+                "pip",
+                "install",
+                "torch",
+                "torchvision",
+                "torchaudio",
+                "--index-url",
+                "https://download.pytorch.org/whl/cu121",
+            ]
+
             if not is_lightning:
                 # Use conda run in non-Lightning environments
                 cmd = ["conda", "run", "-n", "cut3r"] + cmd
+                cmd2 = ["conda", "run", "-n", "cut3r"] + cmd2
 
             subprocess.run(
                 cmd,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+            subprocess.run(
+                cmd2,
                 check=True,
                 capture_output=True,
                 text=True,
@@ -545,5 +563,5 @@ if __name__ == "__main__":
             description="Generates 3D point clouds from image sequences using ARCroco3DStereo"
         )
     )
-    server = ls.LitServer(pointcloud_api)
+    server = ls.LitServer(pointcloud_api, timeout=False)
     server.run(port=8000)

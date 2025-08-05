@@ -1,5 +1,11 @@
 # 3D MCP Tools
 
+## Install
+
+```bash
+pip install pydantic litserve fastmcp open3d
+```
+
 This repository contains three Model Context Protocol (MCP) tools for 3D data processing and analysis:
 
 ## 1. Point Cloud Generation MCP (`mcp_point_cloud_generation.py`)

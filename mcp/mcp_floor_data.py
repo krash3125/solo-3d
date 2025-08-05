@@ -102,5 +102,5 @@ if __name__ == "__main__":
     api = FloorDataAPI(
         mcp=MCP(description="Generates floor maps from PLY point cloud files")
     )
-    server = ls.LitServer(api)
+    server = ls.LitServer(api, timeout=False)
     server.run(port=8000)

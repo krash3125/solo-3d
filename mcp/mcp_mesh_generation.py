@@ -139,5 +139,5 @@ class MeshGenerationAPI(ls.LitAPI):
 
 if __name__ == "__main__":
     api = MeshGenerationAPI(mcp=MCP(description="Generates meshes from PLY files"))
-    server = ls.LitServer(api)
+    server = ls.LitServer(api, timeout=False)
     server.run(port=8000)

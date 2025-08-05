@@ -34,6 +34,26 @@ class FloorDataAPI(ls.LitAPI):
                     check=True,
                 )
                 print("Repository cloned successfully!")
+
+                # Install requirements after cloning
+                requirements_path = os.path.join(repo_path, "requirements.txt")
+                if os.path.exists(requirements_path):
+                    print("Installing requirements from requirements.txt...")
+                    try:
+                        subprocess.run(
+                            ["pip", "install", "-r", requirements_path],
+                            capture_output=True,
+                            text=True,
+                            check=True,
+                        )
+                        print("Requirements installed successfully!")
+                    except subprocess.CalledProcessError as e:
+                        print(f"Failed to install requirements: {e}")
+                        print(f"Error output: {e.stderr}")
+                        raise RuntimeError(f"Requirements installation failed: {e}")
+                else:
+                    print("No requirements.txt found in cloned repository.")
+
             except subprocess.CalledProcessError as e:
                 print(f"Failed to clone repository: {e}")
                 print(f"Error output: {e.stderr}")

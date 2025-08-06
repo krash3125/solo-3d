@@ -1,6 +1,6 @@
 import open3d as o3d
 import time
-from point_cloud_utils import load_point_cloud
+from .point_cloud_utils import load_point_cloud
 
 
 def alpha_shape_reconstruction(

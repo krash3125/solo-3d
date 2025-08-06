@@ -1,6 +1,6 @@
 import open3d as o3d
 import time
-from .point_cloud_utils import load_point_cloud
+from point_cloud_utils import load_point_cloud
 
 
 def estimate_normals(
@@ -56,11 +56,11 @@ def main(
 
 
 if __name__ == "__main__":
-    input = "./fused_filtered_frames.ply"
+    input = "./fused.ply"
     output = "./ball_pivoting_mesh.ply"
-    radii = [0.005, 0.01, 0.02]  # Try adjusting based on your point cloud scale
+    radii = [0.075, 0.1, 0.15]  # Try adjusting based on your point cloud scale
     # Add downsampling voxel size (e.g., 0.01 for aggressive downsampling, 0.001 for light downsampling)
-    downsample_voxel_size = None  # Set to a value like 0.01 to enable downsampling
+    downsample_voxel_size = 0.05  # Set to a value like 0.01 to enable downsampling
 
     start_time = time.time()
     main(input, output, radii, downsample_voxel_size)

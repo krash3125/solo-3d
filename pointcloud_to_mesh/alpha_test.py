@@ -1,6 +1,6 @@
 import open3d as o3d
 import time
-from .point_cloud_utils import load_point_cloud
+from point_cloud_utils import load_point_cloud
 
 
 def alpha_shape_reconstruction(
@@ -48,11 +48,11 @@ def main(
 
 
 if __name__ == "__main__":
-    input = "./fused_filtered_frames.ply"
+    input = "./fused.ply"
     output = "./alpha_mesh.ply"
     alpha = 0.03
     # Add downsampling voxel size (e.g., 0.01 for aggressive downsampling, 0.001 for light downsampling)
-    downsample_voxel_size = None  # Set to a value like 0.01 to enable downsampling
+    downsample_voxel_size = 0.05  # Set to a value like 0.01 to enable downsampling
 
     start_time = time.time()
     main(input, output, alpha, downsample_voxel_size)

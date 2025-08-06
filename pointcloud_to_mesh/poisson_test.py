@@ -1,7 +1,7 @@
 import open3d as o3d
 import numpy as np
 import time
-from .point_cloud_utils import load_point_cloud
+from point_cloud_utils import load_point_cloud
 
 
 def estimate_normals(

@@ -112,7 +112,7 @@ class MeshGenerationAPI(ls.LitAPI):
         if not os.path.exists(ply_path):
             raise FileNotFoundError(f"PLY file not found: {ply_path}")
         if output_path is None:
-            output_path = os.path.splitext(ply_path)[0] + f"_{method}_mesh.ply"
+            output_path = os.path.splitext(ply_path)[0] + f"_{method.value}_mesh.ply"
 
         # Use functions imported from the cloned repository
         pcd = self.load_point_cloud(ply_path)

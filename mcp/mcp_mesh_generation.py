@@ -79,18 +79,14 @@ class MeshGenerationAPI(ls.LitAPI):
         try:
             from krash3125_solo_3d.pointcloud_to_mesh import (
                 load_point_cloud,
-                preprocess_point_cloud,
                 poisson_reconstruction,
                 alpha_shape_reconstruction,
-                estimate_normals,
                 ball_pivoting_reconstruction,
             )
 
             self.load_point_cloud = load_point_cloud
-            self.preprocess_point_cloud = preprocess_point_cloud
             self.poisson_reconstruction = poisson_reconstruction
             self.alpha_shape_reconstruction = alpha_shape_reconstruction
-            self.estimate_normals = estimate_normals
             self.ball_pivoting_reconstruction = ball_pivoting_reconstruction
 
             print(
@@ -122,14 +118,12 @@ class MeshGenerationAPI(ls.LitAPI):
         pcd = self.load_point_cloud(ply_path)
         mesh = None
         if method == "poisson":
-            pcd = self.preprocess_point_cloud(pcd)
             mesh = self.poisson_reconstruction(
                 pcd, depth=poisson_depth, downsample_voxel_size=downsample_voxel_size
             )
         elif method == "alpha":
             mesh = self.alpha_shape_reconstruction(pcd, alpha, downsample_voxel_size)
         elif method == "ball_pivoting":
-            self.estimate_normals(pcd)
             mesh = self.ball_pivoting_reconstruction(
                 pcd, ball_radii, downsample_voxel_size
             )

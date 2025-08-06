@@ -33,6 +33,9 @@ def ball_pivoting_reconstruction(
         pcd = pcd.voxel_down_sample(voxel_size=downsample_voxel_size)
         print(f"[INFO] Downsampled point cloud has {len(pcd.points)} points")
 
+    # Estimate normals after downsampling
+    estimate_normals(pcd)
+
     mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
         pcd, o3d.utility.DoubleVector(radii)
     )
@@ -50,7 +53,6 @@ def main(
     input_path: str, output_path: str, radii: list, downsample_voxel_size: float = None
 ):
     pcd = load_point_cloud(input_path)
-    estimate_normals(pcd)
     mesh = ball_pivoting_reconstruction(pcd, radii, downsample_voxel_size)
     o3d.io.write_triangle_mesh(output_path, mesh)
     print(f"[INFO] Mesh saved to: {output_path}")

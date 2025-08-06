@@ -11,7 +11,22 @@ def load_point_cloud(path: str) -> o3d.geometry.PointCloud:
     return pcd
 
 
-def preprocess_point_cloud(pcd: o3d.geometry.PointCloud, downsample_voxel_size=None):
+def estimate_normals(
+    pcd: o3d.geometry.PointCloud, radius: float = 0.03, max_nn: int = 50
+):
+    print("[INFO] Estimating normals...")
+    pcd.estimate_normals(
+        search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=radius, max_nn=max_nn)
+    )
+    print("[INFO] Orienting normals consistently...")
+    pcd.orient_normals_consistent_tangent_plane(k=200)
+
+
+def poisson_reconstruction(
+    pcd: o3d.geometry.PointCloud, depth: int = 8, downsample_voxel_size: float = None
+) -> o3d.geometry.TriangleMesh:
+    print(f"[INFO] Running Poisson Reconstruction with depth = {depth}")
+
     # Downsample if voxel_size is provided
     if downsample_voxel_size is not None:
         print(
@@ -20,20 +35,9 @@ def preprocess_point_cloud(pcd: o3d.geometry.PointCloud, downsample_voxel_size=N
         pcd = pcd.voxel_down_sample(voxel_size=downsample_voxel_size)
         print(f"[INFO] Downsampled point cloud has {len(pcd.points)} points")
 
-    print("[INFO] Estimating normals...")
-    pcd.estimate_normals(
-        search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.03, max_nn=50)
-    )
-    print("[INFO] Orienting normals consistently...")
-    pcd.orient_normals_consistent_tangent_plane(k=200)
+    # Estimate normals after downsampling
+    estimate_normals(pcd)
 
-    return pcd
-
-
-def poisson_reconstruction(
-    pcd: o3d.geometry.PointCloud, depth: int = 8
-) -> o3d.geometry.TriangleMesh:
-    print(f"[INFO] Running Poisson Reconstruction with depth = {depth}")
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         pcd, depth=depth
     )
@@ -58,10 +62,9 @@ def main(
     input_path: str, output_path: str, depth: int, downsample_voxel_size: float = None
 ):
     pcd = load_point_cloud(input_path)
-    pcd = preprocess_point_cloud(pcd, downsample_voxel_size)
 
     try:
-        mesh = poisson_reconstruction(pcd, depth)
+        mesh = poisson_reconstruction(pcd, depth, downsample_voxel_size)
         o3d.io.write_triangle_mesh(output_path, mesh)
         print(f"[INFO] Mesh saved to: {output_path}")
         # visualize_geometries(

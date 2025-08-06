@@ -11,9 +11,14 @@ def load_point_cloud(path: str) -> o3d.geometry.PointCloud:
     return pcd
 
 
-def preprocess_point_cloud(pcd: o3d.geometry.PointCloud, downsample_voxel_size=0.003):
-    print(f"[INFO] Downsampling point cloud with voxel size = {downsample_voxel_size}")
-    pcd = pcd.voxel_down_sample(voxel_size=downsample_voxel_size)
+def preprocess_point_cloud(pcd: o3d.geometry.PointCloud, downsample_voxel_size=None):
+    # Downsample if voxel_size is provided
+    if downsample_voxel_size is not None:
+        print(
+            f"[INFO] Downsampling point cloud with voxel size = {downsample_voxel_size}"
+        )
+        pcd = pcd.voxel_down_sample(voxel_size=downsample_voxel_size)
+        print(f"[INFO] Downsampled point cloud has {len(pcd.points)} points")
 
     print("[INFO] Estimating normals...")
     pcd.estimate_normals(
@@ -49,9 +54,11 @@ def visualize_geometries(geometries, title="Open3D Viewer"):
     )
 
 
-def main(input_path: str, output_path: str, depth: int):
+def main(
+    input_path: str, output_path: str, depth: int, downsample_voxel_size: float = None
+):
     pcd = load_point_cloud(input_path)
-    pcd = preprocess_point_cloud(pcd)
+    pcd = preprocess_point_cloud(pcd, downsample_voxel_size)
 
     try:
         mesh = poisson_reconstruction(pcd, depth)
@@ -69,8 +76,10 @@ if __name__ == "__main__":
     input = "./fused_filtered_frames.ply"
     output = "./poisson_mesh.ply"
     depth = 8  # Safer value than 9
+    # Add downsampling voxel size (e.g., 0.01 for aggressive downsampling, 0.001 for light downsampling)
+    downsample_voxel_size = None  # Set to a value like 0.01 to enable downsampling
 
     start_time = time.time()
-    main(input, output, depth)
+    main(input, output, depth, downsample_voxel_size)
     end_time = time.time()
     print(f"[INFO] Time taken: {end_time - start_time:.2f} seconds")

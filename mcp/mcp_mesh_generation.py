@@ -25,6 +25,7 @@ class MeshGenerationRequest(BaseModel):
     poisson_depth: Optional[int] = 8
     alpha: Optional[float] = 0.03
     ball_radii: Optional[List[float]] = [0.005, 0.01, 0.02]
+    downsample_voxel_size: Optional[float] = None
 
 
 class MeshGenerationAPI(ls.LitAPI):
@@ -110,6 +111,7 @@ class MeshGenerationAPI(ls.LitAPI):
         poisson_depth = req.poisson_depth
         alpha = req.alpha
         ball_radii = req.ball_radii
+        downsample_voxel_size = req.downsample_voxel_size
 
         if not os.path.exists(ply_path):
             raise FileNotFoundError(f"PLY file not found: {ply_path}")
@@ -121,12 +123,16 @@ class MeshGenerationAPI(ls.LitAPI):
         mesh = None
         if method == "poisson":
             pcd = self.preprocess_point_cloud(pcd)
-            mesh = self.poisson_reconstruction(pcd, depth=poisson_depth)
+            mesh = self.poisson_reconstruction(
+                pcd, depth=poisson_depth, downsample_voxel_size=downsample_voxel_size
+            )
         elif method == "alpha":
-            mesh = self.alpha_shape_reconstruction(pcd, alpha)
+            mesh = self.alpha_shape_reconstruction(pcd, alpha, downsample_voxel_size)
         elif method == "ball_pivoting":
             self.estimate_normals(pcd)
-            mesh = self.ball_pivoting_reconstruction(pcd, ball_radii)
+            mesh = self.ball_pivoting_reconstruction(
+                pcd, ball_radii, downsample_voxel_size
+            )
         else:
             raise ValueError(f"Unknown method: {method}")
 
